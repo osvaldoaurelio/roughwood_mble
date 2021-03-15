@@ -1,14 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text } from 'react-native';
+import { Alert, Text, View } from 'react-native';
 import Swiper from 'react-native-deck-swiper';
-import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import { done, mineOrders, progress } from '../../services/order';
 import LoaderSpinner from '../../components/LoaderSpinner';
 import { useAuth } from '../../contexts/auth';
 import { status } from '../../utils';
 
-import { Container } from './styles';
+import {
+  Container,
+  Card,
+  StyledTouchableOpacity,
+  StyledText,
+  CenterText,
+  BoldText,
+} from './styles';
 
 export default function () {
   const [loading, setLoading] = useState(true);
@@ -17,18 +23,32 @@ export default function () {
 
   const { signOut, user } = useAuth();
 
+  const showStatus = status => {
+    const s = {
+      progress: 'em progresso',
+      late: 'atrasada',
+      pending: 'pendente',
+    }
+    return s[status];
+  };
+
+  const updateStatus = status => {
+    if (status === 'pending') return 'em progresso';
+    return 'concluída';
+  };
+
   const handleTap = async cardIndex => {
     setLoading(true);
     const order = orders[cardIndex];
-    console.log(orders.length);
     ['progress', 'late'].includes(order.status) && await done(order);
     ['pending'].includes(order.status) && await progress(order);
     loadOrders();
+    Alert.alert(`Sua ordem foi atualizada para ${updateStatus(order.status)}`);
   };
 
   const loadOrders = async () => {
     const { orders, error } = await mineOrders();
-    orders && setOrders(orders);
+    orders && setOrders(orders.sort((a, b) => a.status >= b.status));
     error && setError(error);
     setLoading(false);
   };
@@ -48,7 +68,6 @@ export default function () {
 
   return (
     <>
-      <Text onPress={signOut}>{user?.name}</Text>
       <Container>
         <Swiper
           cards={orders}
@@ -57,22 +76,39 @@ export default function () {
           disableLeftSwipe={true}
           disableRightSwipe={true}
           disableTopSwipe={true}
-          // cardStyle={{ backgroundColor: '#777' }}
           containerStyle={{ backgroundColor: '#E9EDC9' }}
           onTapCard={handleTap}
           renderCard={order => order && (
-            <View style={{ flex: 1, border: 1, borderColor: '#f80', backgroundColor: status(order.status).bgColor }}>
-              <Text>{order.description} - {order.id} - {order.status}</Text>
-              {console.log(status(order.status).bgColor)}
-            </View>
+            <Card bgColor={status(order.status).bgColor}>
+              <View style={{ flex: 1 }}>
+                <BoldText>Descrição: {order.description}</BoldText>
+                <StyledText>Cliente: {order.customer.name}</StyledText>
+                <Text>Data inicial: {
+                  new Date(order.initial_date).toLocaleDateString()
+                }
+                </Text>
+                <Text>Data final: {
+                  new Date(order.final_date).toLocaleDateString()
+                }
+                </Text>
+                <BoldText>Valor da mão de obra: {order.labor_cost}</BoldText>
+              </View>              
+              <Text>
+                Esta ordem está {
+                  showStatus(order.status)
+                } toque para atualizar seu status para {
+                  updateStatus(order.status)
+                }
+              </Text>
+            </Card>
           )}
         />
       </Container>
-      <TouchableOpacity onPress={signOut} >
-        <Text>
+      <StyledTouchableOpacity onPress={signOut} >
+        <CenterText>
           Toque aqui para sair do sistema
-        </Text>
-      </TouchableOpacity>
+        </CenterText>
+      </StyledTouchableOpacity>
     </>
   );
 }

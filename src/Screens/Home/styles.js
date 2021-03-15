@@ -1,4 +1,5 @@
 import styled from 'styled-components/native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 export const Container = styled.View`
   flex: 1;
@@ -8,61 +9,32 @@ export const Container = styled.View`
   background-color: #E9EDC9;
 `;
 
-export const Form = styled.View`
+export const Card = styled.View`
+  flex: 1;
   padding: 24px;
-  margin: 24px 0;
-  border-radius: 4px;
-  background-color: #fff;
-  border: 2px solid #cdd4d9;
+  border-color: #f80;
+  justify-content: space-between;
+  background-color: ${({ bgColor }) => bgColor};
+
 `;
 
-export const Title = styled.Text`
-  font-size: 30px;
-  font-weight: 700;
-  margin-top: 18px;
+export const StyledTouchableOpacity = styled(TouchableOpacity)`
+  padding: 24px;
+`;
+
+export const StyledText = styled.Text`
+  margin-bottom: 16px;
+  font-size: 18px;
+`;
+
+export const CenterText = styled.Text`
+  font-size: 18px;
   text-align: center;
 `;
 
-export const Image = styled.Image`
-  width: 100%;
-  height: 116px;
-`;
-
-export const ErrorContainer = styled.View``;
-
-export const ErrorText = styled.Text`
-  color: #e81123;
-`;
-
-export const Input = styled.TextInput`
-  margin: 12px 0;
-  font-size: 20px;
-  line-height: 24px;
-  padding: 10px 12px;
-  border-radius: 4px;
-  border: 1px solid ${({ error, value }) => {
-    return (error && !value) ? '#e81123' : '#000';
-  }};
-`;
-
-export const Button = styled.TouchableOpacity`
+export const BoldText = styled.Text`
+  font-size: 16px;
   margin-top: 12px;
-  padding: 10px 12px;
-  border-radius: 4px;
-  align-items: center;
-  background-color: #54361b;
-`;
-
-export const BtnText = styled.Text`
-  color: #fff;
-  font-size: 20px;
-  font-weight: 700;
-`;
-
-export const ActionContainer = styled.View`
-  margin-top: 12px;
-`;
-
-export const FormFooter = styled.View`
-  align-items: center;
+  margin-bottom: 24px;
+  font-weight: bold;
 `;
